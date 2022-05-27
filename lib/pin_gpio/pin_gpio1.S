@@ -34,6 +34,7 @@ endfun Pin_init
 .set BSRR,0x10
 .set BRR,0x14
 .set MASCARA_BITS_CONFIG,0xF
+.set CNF_PULL_UP_O_DN,0x8
 
 defun Pin_configura // Pin configurado en analogico significa que los 4 bits esten 0.
     // R0: self, R1: config
@@ -59,9 +60,19 @@ defun Pin_configura // Pin configurado en analogico significa que los 4 bits est
     lsls R3,#2 // multiplico por 4 la posicion
     lsls R5,R3 // asigno el valor de mascara a R5
     bics R4,R5 // todos los bits estan en 0
+    mov  R12,R1
+    ands R1,#MASCARA_BITS_CONFIG
     lsls R1,R3
     orrs R4,R1 // R1 ESTA LA MASCARA CON LOS VALORES QUE HAY QUE PONER PERO ANTES SE DEBE CORREGIR EN LA POSICION QUE SE DEBE PONER LA MASCARA.
     str R4,[R2,R6] // R6 AHORA CONTIENE EL VALOR SI ES CRL O CRH.
+    mov R1,R12
+    ands R4,R1,#MASCARA_BITS_CONFIG
+    cmp R4,#CNF_PULL_UP_O_DN
+    bne 0f
+    ubfx R1,R1,#4,#1
+    bl Pin_escribe
+
+0:    
     pop {R4-R6,PC}
     bx lr
 endfun Pin_configura

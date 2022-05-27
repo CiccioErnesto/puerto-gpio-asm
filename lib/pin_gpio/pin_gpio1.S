@@ -37,16 +37,31 @@ endfun Pin_init
 
 defun Pin_configura // Pin configurado en analogico significa que los 4 bits esten 0.
     // R0: self, R1: config
-    push {R4,R5, LR}
+    push {R4-R6,LR}
     ldr R2,[R0,#Pin__puerto]
     ldr R3,[R0,#Pin__numero]
+    //verificar si es CRL o CRH de acuerdo al numero de pin.
+    cmp R3,#8
+    bhs 0f    // Si es mayor o igual a 8 salta a 0 adelante
+    movs R6,#CRL
+    b 1f
+
+
+0:
+    movs R6,#CRH
+    subs R3,#8  // Le resto 8 a R3 (numero de pin) porque esta en la parte alta 
+
+1:
+    //antes de usar esta seccion del codigo que esta a continuacion debo verificar si es CRL o CRH de acuerdo al numero de pin.
     ldr R4,[R2,#CRL]
     movs R5,#MASCARA_BITS_CONFIG
     lsls R3,#2 // multiplico por 4 la posicion
     lsls R5,R3 // asigno el valor de mascara a R5
     bics R4,R5 // todos los bits estan en 0
-    str R4,[R2,#CRL]
-    pop {R4,R5, PC}
+    lsls R1,R3
+    orrs R4,R1 // R1 ESTA LA MASCARA CON LOS VALORES QUE HAY QUE PONER PERO ANTES SE DEBE CORREGIR EN LA POSICION QUE SE DEBE PONER LA MASCARA.
+    str R4,[R2,R6] // R6 AHORA CONTIENE EL VALOR SI ES CRL O CRH.
+    pop {R4-R6,PC}
     bx lr
 endfun Pin_configura
 

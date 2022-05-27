@@ -46,12 +46,13 @@ defun Pin_configura // Pin configurado en analogico significa que los 4 bits est
     movs R6,#CRL
     b 1f
 
-
 0:
+
     movs R6,#CRH
     subs R3,#8  // Le resto 8 a R3 (numero de pin) porque esta en la parte alta 
 
 1:
+
     //antes de usar esta seccion del codigo que esta a continuacion debo verificar si es CRL o CRH de acuerdo al numero de pin.
     ldr R4,[R2,#CRL]
     movs R5,#MASCARA_BITS_CONFIG
@@ -69,6 +70,11 @@ endfun Pin_configura
 
 defun Pin_escribe
     // R0: self, R1: valor
+    ldr R2,[R0,#Pin__puerto]
+    ldr R3,[R0,#Pin__numero]
+    movs R0,#1
+    lsls R0,R3
+    str R0,[R2,#BRR]
     bx lr
 endfun Pin_escribe
 

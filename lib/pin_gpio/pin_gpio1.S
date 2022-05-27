@@ -33,9 +33,20 @@ endfun Pin_init
 .set ODR,0x0C
 .set BSRR,0x10
 .set BRR,0x14
+.set MASCARA_BITS_CONFIG,0xF
 
-defun Pin_configura
+defun Pin_configura // Pin configurado en analogico significa que los 4 bits esten 0.
     // R0: self, R1: config
+    push {R4,R5, LR}
+    ldr R2,[R0,#Pin__puerto]
+    ldr R3,[R0,#Pin__numero]
+    ldr R4,[R2,#CRL]
+    movs R5,#MASCARA_BITS_CONFIG
+    lsls R3,#2 // multiplico por 4 la posicion
+    lsls R5,R3 // asigno el valor de mascara a R5
+    bics R4,R5 // todos los bits estan en 0
+    str R4,[R2,#CRL]
+    pop {R4,R5, PC}
     bx lr
 endfun Pin_configura
 

@@ -97,11 +97,35 @@ endfun Pin_escribe
 
 defun Pin_lee
     // R0: self
+    ldr     R1,[R0,#Pin__puerto]    // Cargamos la direccion del puerto en R1
+    ldr     R2,[R0,#Pin__numero]    // Cargamos numero de pin en R2
+    mov     R3,#1
+    lsls    R3,R2                   // En un registro cargamos un solo en la posicion del pin a analizar
+    ldr     R0,[R1,#IDR]            // Cargamos en R0 los valores de la entrada
+    tst     R0,R3                       
+    bne     0f                      // Si tenemos un en el pin, salta a la etiqueta 0
+    mov     R0,#0                  
+    b       1f
+0:
+    mov     R0,#1
+1:
     bx lr
-    // R0: valor
+    // R1: valor
 endfun Pin_lee
 defun Pin_leeSalida
     // R0: self
+    ldr     R1,[R0,#Pin__puerto]  
+    ldr     R2,[R0,#Pin__numero]        
+    mov     R3,#1
+    lsls    R3,R2                       
+    ldr     R0,[R1,#ODR]                
+    tst     R0,R3                       
+    bne     0f                         
+    mov     R0,#0                       
+    b       1f
+0:
+    mov     R0,#1
+1:
     bx lr
-    // R0: valor
+    // R1: valor
 endfun Pin_leeSalida
